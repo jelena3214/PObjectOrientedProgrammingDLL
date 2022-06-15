@@ -26,11 +26,12 @@ vector<shared_ptr<Competitor>> Filter::countryFiltering(vector<shared_ptr<Compet
     return competitors;
 }
 
-vector<shared_ptr<Competitor>> Filter::yearFiltering(set<Game> games) {
+vector<shared_ptr<Competitor>> Filter::yearFiltering(set<Game> games, string season) {
     vector<Game> vectGame(games.begin(), games.end());
     vectGame.erase(remove_if(vectGame.begin(), vectGame.end(),
-                             [this](const Game &g) { return g.getYear() != year; }),
-                   vectGame.end());
+                             [this, season](const Game &g) { 
+            if (season.empty())return g.getYear() != year;
+            return (g.getYear() != year) || (g.getName() != season); }), vectGame.end());
 
     if (vectGame.empty())throw ReturnError();
 

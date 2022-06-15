@@ -35,7 +35,7 @@ public:
 
     vector<shared_ptr<Competitor>> countryFiltering(vector<shared_ptr<Competitor>> competitors);
 
-    vector<shared_ptr<Competitor>> yearFiltering(set<Game> games);
+    vector<shared_ptr<Competitor>> yearFiltering(set<Game> games, string season = "");
 
     vector<shared_ptr<Competitor>> eventTypeFiltering(vector<shared_ptr<Competitor>> competitors);
 
@@ -45,6 +45,7 @@ public:
     void ispisi() {
         cout << sport << country << eventType << medalType << endl;
     }
+    int getYear()const { return year; }
 };
 
 

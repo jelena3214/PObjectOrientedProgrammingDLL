@@ -12,15 +12,14 @@ int DataManipulation::numberOfPlayers(Filter f, string country) {
     vector<shared_ptr<Competitor>> res;
     try {
         res = getFilteredCompetitors(std::move(f));
-    } catch (const exception &e) {
-        
-        cout << e.what() << endl;
-        throw BasicFilteringError();
+    } catch (const ReturnError& r) { //prazan
+        return 0;
+        //cout << e.what() << endl;
+        //throw BasicFilteringError();
     }
     set<int> ids;
 
     for (const shared_ptr<Competitor> &cmp: res) {
-        if (cmp->getCountry()->getName() != country)continue;
         auto &tmp = cmp->getId();
         for (int p: tmp) {
             ids.insert(p);
@@ -30,14 +29,18 @@ int DataManipulation::numberOfPlayers(Filter f, string country) {
     return ids.size();
 }
 
-int DataManipulation::numOfDisciplines(Filter f) {
+int DataManipulation::numOfDisciplines(Filter f, string season) {
     vector<shared_ptr<Competitor>> res;
     try {
-        res = getFilteredCompetitors(std::move(f));
-    } catch (const exception &e) {
-        cout << e.what() << endl;
-        throw BasicFilteringError();
+        res = getFilteredCompetitors(std::move(f), season);
+    } catch (const ReturnError& r) { //PRAZAN JE
+        return 0;
+        //cout << e.what() << endl;
+        //throw BasicFilteringError();
     }
+
+    cout << "VELL " << res.size();
+
     set<shared_ptr<Event>, Event::EventPrtComp> events;
     for (const shared_ptr<Competitor> &c: res) {
         events.insert(c->getEvent());
@@ -46,18 +49,18 @@ int DataManipulation::numOfDisciplines(Filter f) {
     return events.size();
 }
 
-vector<shared_ptr<Competitor>> DataManipulation::getFilteredCompetitors(Filter f) {
-    auto res = evParser->getCompetitors();
+vector<shared_ptr<Competitor>> DataManipulation::getFilteredCompetitors(Filter f, string season) {
+    vector<shared_ptr<Competitor>> res = evParser->getCompetitors();
+  
     if (res.empty()) {
-        cout << "getFilteredCompetitors function :: ";
-        throw ErrorGettingDataFromEventParser();
+        //cout << "getFilteredCompetitors function :: ";
+        throw ReturnError();
     }
 
     if (f.isYearSet()) {
         try {
-            res = f.yearFiltering(evParser->getGames());
+            res = f.yearFiltering(evParser->getGames(), season);
         } catch (const ReturnError &r) {
-            
             throw ReturnError();
         }
     }
@@ -386,10 +389,10 @@ vector<shared_ptr<Competitor>> DataManipulation::getCompetitorsOnGame(int year, 
         }
     }
 
-    if (vectGame.empty()) {
+    /*if (vectGame.empty()) {
         cout << "helper error : game not found :: ";
         throw AdvancedFilteringError();
-    }
+    }*/
 
     vector<shared_ptr<Competitor>> competitors; //Competitors on those games
     for (auto elem: vectGame) {

@@ -30,13 +30,13 @@ public:
      */
     int numberOfPlayers(Filter f, string country);
 
-    int numOfDisciplines(Filter f);
+    int numOfDisciplines(Filter f, string season);
 
     double averageAthletesHeight(Filter f);
 
     double averageAthletesWeight(Filter f);
 
-    vector<shared_ptr<Competitor>> getFilteredCompetitors(Filter f);
+    vector<shared_ptr<Competitor>> getFilteredCompetitors(Filter f, string season = "");
 
     /**
      * Advanced data operations

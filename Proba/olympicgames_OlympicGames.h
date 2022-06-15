@@ -17,6 +17,14 @@ extern "C" {
 
 	/*
 	 * Class:     olympicgames_OlympicGames
+	 * Method:    numOfDisciplinesSeason
+	 * Signature: (Ljava/lang/Long;Ljava/lang/Long;Ljava/lang/String;IIIILjava/lang/String;)Ljava/util/HashMap;
+	 */
+	JNIEXPORT jobject JNICALL Java_olympicgames_OlympicGames_numOfDisciplinesSeason
+	(JNIEnv*, jobject, jobject, jobject, jstring, jint, jint, jint, jint, jstring);
+
+	/*
+	 * Class:     olympicgames_OlympicGames
 	 * Method:    initEvents
 	 * Signature: (Ljava/lang/String;)J
 	 */

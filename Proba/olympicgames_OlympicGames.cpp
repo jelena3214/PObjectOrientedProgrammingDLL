@@ -4,23 +4,31 @@
 People* athletes = People::getInstance();
 EventParser* evParser = new EventParser();
 
-map<string, int> countryNumOfParticipants(string sport, int year, string evt, string mdt) {
-	auto countries = evParser->getCountries();
-	DataManipulation dm(evParser, athletes);
-	map<string, int> returnMap;
-	for (const shared_ptr<Country>& cnt : countries) {
-		//returnMap.insert({ cnt->getName(), dm.numberOfPlayers(Filter(), cnt->getName()) });
+string getType(int num) {
+	switch (num) {
+	case 1:
+		return "Individal";
+	case 2:
+		return "Team";
+	default:
+		return "";
 	}
-	return returnMap;
 }
 
-/*JNIEXPORT jobject JNICALL Java_olympicgames_OlympicGames_numOfParticipants
-(JNIEnv* env, jobject, jstring sport, jint, jint, jint) {
-	jboolean isCopy;
-	const char* newDir = (*env).GetStringUTFChars(sport, &isCopy);
-	//std::string Csport = std::string(newDir, )
-}*/
-
+string getMedalType(int num) {
+	switch (num) {
+	case 1:
+		return "Gold";
+	case 2:
+		return "Silver";
+	case 3:
+		return "Bronze";
+	case 4:
+		return "NA";
+	default:
+		return "";
+	}
+}
 
 //COPY CONSTRUCTON AKO HOCEMO DA RADI I PITAJ ACU ZASTO NECE
 
@@ -35,45 +43,22 @@ JNIEXPORT jobject JNICALL Java_olympicgames_OlympicGames_numOfParticipants
 	jboolean isCopy;
 	const char* convSport = (*env).GetStringUTFChars(sport, &isCopy);
 	string ss = convSport;
-	cout << ss << "CONVV";
 	env->ReleaseStringUTFChars(sport, convSport);
 	string stype, smedal;
-	switch ((int)type) {
-		case 0: 
-			stype = "Individal";
-			break;
-		case 1: 
-			stype = "Team";
-			break;
-		default:
-			stype = "";
-	}
-	
+	stype = getType((int)type);
+	smedal = getMedalType((int)medalType);
 
-	switch ((int)medalType) {
-		case 0:
-			smedal = "Gold";
-			break;
-		case 1:
-			smedal = "Silver";
-			break;
-		case 2:
-			smedal = "Bronze";
-			break;
-		default:
-			smedal = "";
-	}
-	//cout << evParser->competitors.size() << " VEL";
-	//vector<shared_ptr<Competitor>> cp = evP->competitors;
-	//cout << "DOVDE0";
-	cout << smedal << " " << stype;
-	
+	int all = 0;
 	for (const shared_ptr<Country>& cnt : countries) {
 		Filter f(ss, cnt->getName(), (int)year, stype, smedal);
-		//cout << "PRE "; f.ispisi();
 		int num = dm.numberOfPlayers(f, cnt->getName());
-		if(num)returnMap.insert({ cnt->getName(), num });
+		if (num) {
+			returnMap.insert({ cnt->getName(), num });
+			all += num;
+		}
 	}
+
+	cout << "BROJJ " << all << endl;
 	cout << returnMap.size() << "MAP SIZE" << endl;
 	jclass mapClass = env->FindClass("java/util/HashMap");
 	//cout << "DOVDE11";
@@ -115,7 +100,6 @@ JNIEXPORT jlong JNICALL Java_olympicgames_OlympicGames_initEvents
 }
 
 
-
 JNIEXPORT jlong JNICALL Java_olympicgames_OlympicGames_initAthletes
 (JNIEnv* env, jclass, jstring filename) {
 	jboolean isCopy;
@@ -124,4 +108,60 @@ JNIEXPORT jlong JNICALL Java_olympicgames_OlympicGames_initAthletes
 	AthetesParser ath(evParser->getAthleteIds());
 	ath.athletesParse(filen, *athletes);
 	return (jlong)athletes;
+}
+
+
+JNIEXPORT jobject JNICALL Java_olympicgames_OlympicGames_numOfDisciplinesSeason
+(JNIEnv* env, jobject, jobject ath, jobject events, jstring sportN, jint startY, jint endY, jint type, jint medal, jstring seasonN) {
+	DataManipulation dm(evParser, athletes);
+	jboolean isCopy;
+	const char* convSport = (*env).GetStringUTFChars(sportN, &isCopy);
+	string sport = convSport;
+	env->ReleaseStringUTFChars(sportN, convSport);
+
+	const char* convSeason = (*env).GetStringUTFChars(seasonN, &isCopy);
+	string season = convSeason;
+	env->ReleaseStringUTFChars(seasonN, convSeason);
+
+	int startYear = (int)startY;
+	int endYear = (int)endY;
+	string eventType = getType((int)type);
+	string medalType = getMedalType((int)medal);
+
+
+	map<int, int> returnMap;
+	cout << "DOVDE" << endl;
+	for (int i = startYear; i <= endYear; i++) {
+		Filter f(sport, "", i, eventType, medalType);
+		//cout << "DOVDEEEEEE" << endl;
+		returnMap.insert({ i, dm.numOfDisciplines(f, season) });
+	}
+	
+	cout << returnMap.size() << "MAP SIZE" << endl;
+	jclass mapClass = env->FindClass("java/util/HashMap");
+	jmethodID init = env->GetMethodID(mapClass, "<init>", "()V");
+	jobject hashMap = env->NewObject(mapClass, init);
+	jmethodID put = env->GetMethodID(mapClass, "put", "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;");
+
+	auto consIterator = returnMap.begin();
+	for (; consIterator != returnMap.end(); ++consIterator) {
+		jint keyJava = consIterator->first;
+		jint valueJava = consIterator->second;
+
+		jclass cls1 = env->FindClass("java/lang/Integer");
+		jmethodID midInit1 = env->GetMethodID(cls1, "<init>", "(I)V");
+		jobject newObj1 = env->NewObject(cls1, midInit1, keyJava);
+
+		jclass cls2 = env->FindClass("java/lang/Integer");
+		jmethodID midInit2 = env->GetMethodID(cls2, "<init>", "(I)V");
+		jobject newObj2 = env->NewObject(cls2, midInit2, valueJava);
+
+		env->CallObjectMethod(hashMap, put, newObj1, newObj2);
+		env->DeleteLocalRef(newObj1);
+		env->DeleteLocalRef(newObj2);
+	}
+	jobject hashMapGobal = static_cast<jobject>(env->NewGlobalRef(hashMap));
+	env->DeleteLocalRef(hashMap);
+	env->DeleteLocalRef(mapClass);
+	return hashMapGobal;
 }
