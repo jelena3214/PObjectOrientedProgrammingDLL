@@ -6,7 +6,7 @@
 #define POOP_FILTER_H
 
 #include <string>
-#include <vector>
+#include <list>
 #include "EventTypeClass.h"
 #include "MedalTypeClass.h"
 #include "Competitor.h"
@@ -31,15 +31,15 @@ public:
         if (!mt.empty()) medalType = MedalTypeClass::getMedalTypeFromString(mt), medalFlag = true;
     }
 
-    vector<shared_ptr<Competitor>> sportFiltering(vector<shared_ptr<Competitor>> competitors);
+    list<shared_ptr<Competitor>> sportFiltering(list<shared_ptr<Competitor>> competitors);
 
-    vector<shared_ptr<Competitor>> countryFiltering(vector<shared_ptr<Competitor>> competitors);
+    list<shared_ptr<Competitor>> countryFiltering(list<shared_ptr<Competitor>> competitors);
 
-    vector<shared_ptr<Competitor>> yearFiltering(set<Game> games, string season = "");
+    list<shared_ptr<Competitor>> yearFiltering(set<Game> games, string season = "");
 
-    vector<shared_ptr<Competitor>> eventTypeFiltering(vector<shared_ptr<Competitor>> competitors);
+    list<shared_ptr<Competitor>> eventTypeFiltering(list<shared_ptr<Competitor>> competitors);
 
-    vector<shared_ptr<Competitor>> medalTypeFiltering(vector<shared_ptr<Competitor>> competitors);
+    list<shared_ptr<Competitor>> medalTypeFiltering(list<shared_ptr<Competitor>> competitors);
 
     bool isYearSet() const { return year != 0; }
     void ispisi() {

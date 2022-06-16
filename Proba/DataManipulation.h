@@ -7,6 +7,7 @@
 
 #include <algorithm>
 #include <vector>
+#include <list>
 #include "Filter.h"
 #include "EventParser.h"
 #include "AthletesParser.h"
@@ -32,9 +33,9 @@ public:
 
     int numOfDisciplines(Filter f, string season);
 
-    double averageAthletesHeight(Filter f);
+    int averageAthletesHeight(Filter f, string season);
 
-    double averageAthletesWeight(Filter f);
+    int averageAthletesWeight(Filter f, string season);
 
     vector<shared_ptr<Competitor>> getFilteredCompetitors(Filter f, string season = "");
 

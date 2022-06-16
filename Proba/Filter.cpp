@@ -6,7 +6,7 @@
 #include "Country.h"
 #include "Exceptions.h"
 
-vector<shared_ptr<Competitor>> Filter::sportFiltering(vector<shared_ptr<Competitor>> competitors) {
+list<shared_ptr<Competitor>> Filter::sportFiltering(list<shared_ptr<Competitor>> competitors) {
     if (sport.empty())return competitors;
     competitors.erase(remove_if(competitors.begin(), competitors.end(),
                                 [this](const shared_ptr<Competitor> &comp) {
@@ -16,7 +16,7 @@ vector<shared_ptr<Competitor>> Filter::sportFiltering(vector<shared_ptr<Competit
     return competitors;
 }
 
-vector<shared_ptr<Competitor>> Filter::countryFiltering(vector<shared_ptr<Competitor>> competitors) {
+list<shared_ptr<Competitor>> Filter::countryFiltering(list<shared_ptr<Competitor>> competitors) {
     if (country.empty())return competitors;
     competitors.erase(remove_if(competitors.begin(), competitors.end(),
                                 [this](const shared_ptr<Competitor> &comp) {
@@ -26,8 +26,8 @@ vector<shared_ptr<Competitor>> Filter::countryFiltering(vector<shared_ptr<Compet
     return competitors;
 }
 
-vector<shared_ptr<Competitor>> Filter::yearFiltering(set<Game> games, string season) {
-    vector<Game> vectGame(games.begin(), games.end());
+list<shared_ptr<Competitor>> Filter::yearFiltering(set<Game> games, string season) {
+    list<Game> vectGame(games.begin(), games.end());
     vectGame.erase(remove_if(vectGame.begin(), vectGame.end(),
                              [this, season](const Game &g) { 
             if (season.empty())return g.getYear() != year;
@@ -35,7 +35,7 @@ vector<shared_ptr<Competitor>> Filter::yearFiltering(set<Game> games, string sea
 
     if (vectGame.empty())throw ReturnError();
 
-    vector<shared_ptr<Competitor>> returnVect;
+    list<shared_ptr<Competitor>> returnVect;
     for (auto tmp: vectGame) {
         for (const auto &person: *tmp.getCompetitors()) {
             returnVect.push_back(person);
@@ -44,7 +44,7 @@ vector<shared_ptr<Competitor>> Filter::yearFiltering(set<Game> games, string sea
     return returnVect;
 }
 
-vector<shared_ptr<Competitor>> Filter::eventTypeFiltering(vector<shared_ptr<Competitor>> competitors) {
+list<shared_ptr<Competitor>> Filter::eventTypeFiltering(list<shared_ptr<Competitor>> competitors) {
     if (!eventFlag)return competitors;
     competitors.erase(remove_if(competitors.begin(), competitors.end(),
                                 [this](const shared_ptr<Competitor> &comp) {
@@ -54,7 +54,7 @@ vector<shared_ptr<Competitor>> Filter::eventTypeFiltering(vector<shared_ptr<Comp
     return competitors;
 }
 
-vector<shared_ptr<Competitor>> Filter::medalTypeFiltering(vector<shared_ptr<Competitor>> competitors) {
+list<shared_ptr<Competitor>> Filter::medalTypeFiltering(list<shared_ptr<Competitor>> competitors) {
     if (!medalFlag) return competitors;
     competitors.erase(remove_if(competitors.begin(), competitors.end(),
                                 [this](const shared_ptr<Competitor> &comp) { return comp->getMedal() != medalType; }),

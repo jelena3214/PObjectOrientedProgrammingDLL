@@ -5,6 +5,7 @@
 #include "DataManipulation.h"
 #include "Exceptions.h"
 #include <unordered_map>
+#include <unordered_set>
 #include <utility>
 
 int DataManipulation::numberOfPlayers(Filter f, string country) {
@@ -17,7 +18,7 @@ int DataManipulation::numberOfPlayers(Filter f, string country) {
         //cout << e.what() << endl;
         //throw BasicFilteringError();
     }
-    set<int> ids;
+    unordered_set<int> ids;
 
     for (const shared_ptr<Competitor> &cmp: res) {
         auto &tmp = cmp->getId();
@@ -50,7 +51,9 @@ int DataManipulation::numOfDisciplines(Filter f, string season) {
 }
 
 vector<shared_ptr<Competitor>> DataManipulation::getFilteredCompetitors(Filter f, string season) {
-    vector<shared_ptr<Competitor>> res = evParser->getCompetitors();
+    auto input = evParser->getCompetitors();
+    
+    list<shared_ptr<Competitor>> res(input.begin(), input.end());
   
     if (res.empty()) {
         //cout << "getFilteredCompetitors function :: ";
@@ -68,16 +71,21 @@ vector<shared_ptr<Competitor>> DataManipulation::getFilteredCompetitors(Filter f
     res = f.countryFiltering(res);
     res = f.eventTypeFiltering(res);
     res = f.medalTypeFiltering(res);
-    return res;
+
+
+    vector<shared_ptr<Competitor>> output(res.begin(), res.end());
+
+    return output;
 }
 
-double DataManipulation::averageAthletesHeight(Filter f) {
+int DataManipulation::averageAthletesHeight(Filter f, string season) {
     vector<shared_ptr<Competitor>> res;
     try {
-        res = getFilteredCompetitors(std::move(f));
+        res = getFilteredCompetitors(std::move(f), season);
     } catch (const exception &e) {
-        cout << e.what() << endl;
-        throw BasicFilteringError();
+        return 0;
+        //cout << e.what() << endl;
+        //throw BasicFilteringError();
     }
 
     int averageHeight = 0;
@@ -96,13 +104,14 @@ double DataManipulation::averageAthletesHeight(Filter f) {
 
 }
 
-double DataManipulation::averageAthletesWeight(Filter f) {
+int DataManipulation::averageAthletesWeight(Filter f, string season) {
     vector<shared_ptr<Competitor>> res;
     try {
-        res = getFilteredCompetitors(std::move(f));
+        res = getFilteredCompetitors(std::move(f), season);
     } catch (const exception &e) {
-        cout << e.what() << endl;
-        throw BasicFilteringError();
+        return 0;
+        //cout << e.what() << endl;
+        //throw BasicFilteringError();
     }
 
     int averageWeight = 0;
